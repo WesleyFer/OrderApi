@@ -28,14 +28,14 @@ services:
     volumes:
       - rabbitmq-data:/var/lib/rabbitmq
       - rabbitmq-logs:/var/log/rabbitmq
-  api:
+  order-api:
     build:
       context: ./src
       dockerfile: ../src/Dockerfile
     depends_on:
       - mysql-mysqldb-1
       - rabbitmq-1
-    container_name: api
+    container_name: order-api
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__MySql=Server=mysql-mysqldb-1;User Id=root;Password=B4nc0;Allow User Variables=true;Database=OrderApi;AllowLoadLocalInfile=true;
