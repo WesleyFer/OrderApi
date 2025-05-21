@@ -1,0 +1,76 @@
+version: "3.8"
+
+services:
+  mysql-mysqldb-1:
+    image: mysql:8
+    container_name: mysql-mysqldb-1
+    environment:
+      MYSQL_ROOT_PASSWORD: B4nc0
+    ports:
+      - "3306:3306"
+    networks:
+      - order-api-network
+    volumes:
+      - mysql_data:/var/lib/mysql
+  rabbitmq-1:
+    image: rabbitmq:3-management
+    container_name: rabbitmq-1
+    hostname: rabbitmq
+    ports:
+      - 5672:5672
+      - 15672:15672
+    restart: always
+    environment:
+      RABBITMQ_DEFAULT_USER: rabbitmq
+      RABBITMQ_DEFAULT_PASS: B4nc0
+    networks:
+      - order-api-network
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+      - rabbitmq-logs:/var/log/rabbitmq
+  api:
+    build:
+      context: ./src
+      dockerfile: ../src/Dockerfile
+    depends_on:
+      - mysql-mysqldb-1
+      - rabbitmq-1
+    container_name: api
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__MySql=Server=mysql-mysqldb-1;User Id=root;Password=B4nc0;Allow User Variables=true;Database=OrderApi;AllowLoadLocalInfile=true;
+      - ConnectionStrings__MySqlAuth=Server=mysql-mysqldb-1;User Id=root;Password=B4nc0;Allow User Variables=true;Database=OrderApiAuth;AllowLoadLocalInfile=true;
+      - JwtSettings__Secret=3a49cbd0-e8da-4730-b239-fc65471ce40b
+      - JwtSettings__ExpiracaoHoras=8
+      - JwtSettings__Emissor=OrderApiAuth
+      - JwtSettings__ValidoEm=https://order-api.exemplo.com.br
+      - MassTransitConfig__Host=rabbitmq-1
+      - MassTransitConfig__VirtualHost=/
+      - MassTransitConfig__Usuario=rabbitmq
+      - MassTransitConfig__Senha=B4nc0
+    ports:
+      - "5009:5009" # HTTP
+      - "7127:7127" # HTTPS
+    volumes:
+      - ./certs/localhost.pfx:/https/localhost.pfx:ro
+    networks:
+      - order-api-network
+    command: >
+      sh -c "
+        echo 'Aguardando MySQL...';
+        while ! (echo > /dev/tcp/mysql-mysqldb-1/3306) 2>/dev/null; do sleep 3; done;
+        echo 'MySQL pronto!';
+        echo 'Aguardando RabbitMQ...';
+        while ! (echo > /dev/tcp/rabbitmq-1/5672) 2>/dev/null; do sleep 3; done;
+        echo 'RabbitMQ pronto!';
+        dotnet Order.Api.dll
+      "
+networks:
+  order-api-network:
+    driver: bridge
+volumes:
+  mysql_data:
+  rabbitmq-data:
+    driver: local
+  rabbitmq-logs:
+    driver: local
