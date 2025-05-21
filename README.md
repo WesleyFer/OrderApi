@@ -1,7 +1,7 @@
 
-# 🏦 [DESAFIO BTG Pactual] - Sistema de Processamento de Pedidos
+# 🏦 Sistema de Processamento de Pedidos
 
-Este repositório contém a solução para o desafio técnico de engenheiro de software proposto pelo BTG Pactual. O sistema implementado utiliza arquitetura moderna com microsserviços, mensageria, persistência em banco de dados e exposição via API REST.
+Este repositório contém a solução para o desafio técnico de engenheiro de software. O sistema implementado utiliza arquitetura moderna com microsserviços, mensageria, persistência em banco de dados e exposição via API REST.
 
 ---
 
@@ -128,7 +128,7 @@ Envie essa mensagem para a fila via RabbitMQ Management ou ferramenta de testes 
 
 ## 🔗 Links
 
-- Repositório GitHub: [https://github.com/Wesleyfer/OrderApi](https://github.com/Wesleyfer/OrderApi)
+- Repositório GitHub: [https://github.com/WesleyFer/OrderApi](https://github.com/WesleyFer/OrderApi)
 - Imagem Docker (se publicada): [localhost](localhost)
 
 ---
